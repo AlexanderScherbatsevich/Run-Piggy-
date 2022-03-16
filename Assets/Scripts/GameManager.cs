@@ -1,24 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager S;
+    public Transform navMesh;
     public GameObject prefabStone;
     public TextAsset layoutXML;
     public Layout layout;
     public Transform layoutAnchor;
-    public Vector3 layoutCenter;
+    public List <Vector2> freeSpot;
 
+    private NavMeshSurface2d navMeshSurface2D;
+    private Vector3 _layoutCenter;
     private int _rowCount = 4, _columnCount = 8;
-    Vector2 _firstPosStone = new Vector2(-13.25f, -5.7f);
-    Vector2 _multiplier = new Vector2(3.55f, 3.5f);
+    private Vector2 _firstPosStone = new Vector2(-13.25f, -5.7f);
+    private Vector2 _multiplier = new Vector2(3.55f, 3.5f);
+
+    private void Awake()
+    {
+        S = this;
+        FreeSpotOnGround();
+    }
     private void Start()
     {
+        navMeshSurface2D = GetComponent<NavMeshSurface2d>();
+        
         layout = GetComponent<Layout>();
         layout.ReadLayout(layoutXML.text);
-        LayoutGame();
+        //LayoutGame();
     }
 
     void LayoutGame()
@@ -27,6 +40,7 @@ public class GameManager : MonoBehaviour
         if (layoutAnchor == null)
         {
             GameObject tGO = new GameObject("_LayoutAnchor");
+            tGO.transform.SetParent(navMesh, true);
             layoutAnchor = tGO.transform;
         }
 
@@ -64,8 +78,27 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    public void FreeSpotOnGround()
+    public List<Vector2> FreeSpotOnGround()
     {
 
+        Vector2 firstFreeSpot = _firstPosStone - (_multiplier / 2f);
+        Vector2 tPos = firstFreeSpot;
+        for (int i = 0; i < 5; i++)
+        {
+            tPos = firstFreeSpot;
+            firstFreeSpot.y += _multiplier.y;
+
+            firstFreeSpot.x += 0.3f;
+            for (int j = 0; j < 9; j++)
+            {
+                freeSpot.Add(tPos);
+
+                //GameObject go = Instantiate<GameObject>(prefabStone);
+                //go.transform.position = tPos;
+
+                tPos.x += _multiplier.x;                             
+            }
+        }
+        return freeSpot;
     }
 }
