@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3790816645537024042}
   - component: {fileID: 7925708709484302786}
   - component: {fileID: 2872694016763590400}
+  - component: {fileID: 5787919612725022603}
   m_Layer: 10
   m_Name: prefabBomb
   m_TagString: Bomb
@@ -75,7 +76,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: d0c0090b786866d4ba03a3030b0ce7b4, type: 3}
-  m_Color: {r: 0.7490566, g: 1, b: 0.76602334, a: 1}
+  m_Color: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -134,3 +135,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosionPrefab: {fileID: 8292422915157798011, guid: 14f6aab6ce08eab4d8bc231be2813167, type: 3}
+--- !u!95 &5787919612725022603
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845941719850518959}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6e919ac0248129d4d89fe460db03b00e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

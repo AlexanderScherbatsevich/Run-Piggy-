@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyState
+{
+    isCalm,
+    isAngry,
+    isStuned,
+}
 public class Enemy : MonoBehaviour
 {
-    public static bool isStuned = false;
     public static bool isAngry = false;
 
-    public float timeStune = 3f;
+    public bool isStuned = false;
 
+    public float timeStune = 3f;
     public Vector2 direction;
     Vector2[] dir;
     public Sprite[] spritesCalm;
@@ -19,10 +25,10 @@ public class Enemy : MonoBehaviour
 
     [SerializeField] Transform target;
     private NavMeshAgent agent;
-
+    private EnemyState state = EnemyState.isCalm;
     private float timePassed;
-    private Vector3 newPos;      //две точки дл€ интерпол€ции
-    private float timeStart;     //врем€ создани€ этого корабл€
+    private Vector3 newPos;      
+    private float timeStart;     
     private float duration = 5;  //продолжительность перемещени€
     private void Start()
     {
@@ -41,51 +47,45 @@ public class Enemy : MonoBehaviour
     }
     void Update()
     {
-        //agent.SetDestination(target.position);
-        ChangeSprite();
-        Move();
 
-        if (isStuned)
+        Move(state);
+        ChangeSprite(state);
+        if (isAngry && !isStuned) state = EnemyState.isAngry;
+        else if (isStuned)
         {
-            float tSpeed = agent.speed;
-            agent.speed = 0;
-            Sprite tSprite = spriteRend.sprite;
-            spriteRend.sprite = spritesStuned;
-            timePassed += Time.fixedDeltaTime;
-            float time = timePassed / timeStune;
-            if (time >= 1)
-            {
-                isStuned = false;
-                spriteRend.sprite = tSprite;
-                agent.speed = tSpeed;
-
-            }
+            isAngry = false;
+            state = EnemyState.isStuned;
         }
+        else state = EnemyState.isCalm;
     }
 
-    public void ChangeSprite()
+    public void ChangeSprite(EnemyState state)
     {
         Vector2 pos = this.transform.position;
-        //float xValue = target.position.x - pos.x;
-        //float yValue = target.position.y - pos.y;
+        float xValue;
+        float yValue;
 
-        if (isAngry)
+        switch (state)
         {
-            float xValue = target.position.x - pos.x;
-            float yValue = target.position.y - pos.y;
-            if (yValue > 0 && yValue > xValue) spriteRend.sprite = spritesAngry[2];
-            else if (yValue < 0 && yValue < xValue) spriteRend.sprite = spritesAngry[3];
-            else if (xValue > 0 && yValue < xValue) spriteRend.sprite = spritesAngry[0];
-            else if (xValue < 0 && yValue > xValue) spriteRend.sprite = spritesAngry[1];
-        }
-        else
-        {
-            float xValue = newPos.x - pos.x;
-            float yValue = newPos.y - pos.y;
-            if (yValue > 0 && yValue > xValue) spriteRend.sprite = spritesCalm[2];
-            else if (yValue < 0 && yValue < xValue) spriteRend.sprite = spritesCalm[3];
-            else if (xValue > 0 && yValue < xValue) spriteRend.sprite = spritesCalm[0];
-            else if (xValue < 0 && yValue > xValue) spriteRend.sprite = spritesCalm[1];
+            case EnemyState.isCalm:
+                xValue = newPos.x - pos.x;
+                yValue = newPos.y - pos.y;
+                if (yValue > 0 && yValue > xValue) spriteRend.sprite = spritesCalm[2];
+                else if (yValue < 0 && yValue < xValue) spriteRend.sprite = spritesCalm[3];
+                else if (xValue > 0 && yValue < xValue) spriteRend.sprite = spritesCalm[0];
+                else if (xValue < 0 && yValue > xValue) spriteRend.sprite = spritesCalm[1];
+                break;
+            case EnemyState.isAngry:
+                 xValue = target.position.x - pos.x;
+                 yValue = target.position.y - pos.y;
+                if (yValue > 0 && yValue > xValue) spriteRend.sprite = spritesAngry[2];
+                else if (yValue < 0 && yValue < xValue) spriteRend.sprite = spritesAngry[3];
+                else if (xValue > 0 && yValue < xValue) spriteRend.sprite = spritesAngry[0];
+                else if (xValue < 0 && yValue > xValue) spriteRend.sprite = spritesAngry[1];
+                break;
+            case EnemyState.isStuned:
+                this.spriteRend.sprite = spritesStuned;
+                break;
         }
     }
 
@@ -96,21 +96,11 @@ public class Enemy : MonoBehaviour
     }
     public void InitMovement()
     {
-        // выбрать новую точку р1 на экране
-        //if (isAngry)
-        //{
-        //    newPos = target.position;
-        //}
-        //else
-        //{
-        //    newPos = dir[Random.Range(0,dir.Length)];
-        //}
         newPos = dir[Random.Range(0, dir.Length)];
-        //сбросить врем€
         timeStart = Time.time;
     }
 
-    public void Move()
+    public void Move(EnemyState state)
     {
         float u = (Time.time - timeStart) / duration;
         if (u >= 1)
@@ -118,18 +108,36 @@ public class Enemy : MonoBehaviour
             InitMovement();
             u = 0;
         }
-        if (isAngry) agent.SetDestination(target.position);
-        else agent.SetDestination(newPos);
+
+        switch (state)
+        {
+            case EnemyState.isCalm:
+                agent.SetDestination(newPos);
+                break;
+            case EnemyState.isAngry:
+                agent.SetDestination(target.position);
+                break;
+            case EnemyState.isStuned:
+                agent.SetDestination(this.gameObject.transform.position);
+                break;
+        }
     }
     private void OnTriggerEnter(Collider other)
     {
-        //Transform goTr = other.gameObject.transform;
-        // GameObject go = goTr.gameObject;
         GameObject go = other.gameObject;
-        if (go.tag == "Explosion" || go.tag == "Bomb")
+        if (go.tag == "Explosion")
         {
-            isStuned = true;
+            this.isStuned = true;
+            isAngry = false;
+            state = EnemyState.isStuned;
+            Invoke("ChangeState", 3);
             Debug.Log("enemy say" + other.gameObject.name);
         }
     }
+    public void ChangeState()
+    {
+        state = EnemyState.isCalm;
+        this.isStuned = false;
+    }
+
 }

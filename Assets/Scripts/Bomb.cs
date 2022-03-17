@@ -16,42 +16,6 @@ public class Bomb : MonoBehaviour
         pos.z = -3f;
         explosion.transform.position = pos;
         Destroy(this.gameObject,0.1f);
-        Destroy(explosion, 3.95f);
+        Destroy(explosion, 0.5f);
     }
-
-    //private void OnCollisionEnter(Collision other)
-    //{
-    //    Transform goTr = other.gameObject.transform;
-    //    GameObject go = goTr.gameObject;
-
-    //    if (go.tag == "Enemy")
-    //    {
-
-    //        Explode(go);
-    //        Debug.Log("Bomb say" +go.name);
-
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("Bomb say" +go.name);
-    //    }
-    //}
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    Transform goTr = other.gameObject.transform;
-    //    GameObject go = goTr.gameObject;
-
-    //    if (go.tag == "Enemy")
-    //    {
-
-    //        Explode(go);
-    //        Debug.Log("Bomb say" + go.name);
-
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("Bomb say" + go.name);
-    //    }
-
-    //}
 }

@@ -24,9 +24,4 @@ public class Scale : MonoBehaviour
         }
 
     }
-
-    //public void Filling()
-    //{
-
-    //}
 }

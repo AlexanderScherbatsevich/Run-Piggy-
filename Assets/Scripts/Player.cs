@@ -3,47 +3,58 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     public static bool eaten = false;
 
- 
-    public GameObject textFailed;
+    public GameObject footsteps;
+    public Joystick joystick;
     public GameObject bombPrefab;
     public GameObject ScaleBar;
     public Scale scale;
     public int speed = 10;
     public float timePassed;
     public float timeMax = 5;
-    public float delayBetweenSetBomb = 5f;
+    public float delayBetweenSetBomb = 3f;
     public float lastSetBomb;
+    public Sprite[] sprites;
 
+    private float xAxis, yAxis;
+    private SpriteRenderer spriteRend;
     private NavMeshAgent agent;
+    private int eatenCabbage = 0;
     private void Start()
     {
         delayBetweenSetBomb = 0;
         timePassed = 0;
         scale = ScaleBar.GetComponentInChildren<Scale>();
-
+        spriteRend = GetComponent<SpriteRenderer>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
     }
     void Update()
     {
-        float xAxis = Input.GetAxis("Horizontal");
-        float yAxis = Input.GetAxis("Vertical");
+         xAxis = joystick.Horizontal;
+         yAxis = joystick.Vertical;
 
         Vector3 pos = transform.position;
         pos.x += xAxis * speed * Time.deltaTime;
         pos.y += yAxis * speed * Time.deltaTime;
         transform.position = pos;
 
-        if (Input.GetAxis("Jump") == 1)
+        if (xAxis == 0 && yAxis == 0)
         {
-            SpawnBomb();
+            footsteps.SetActive(false);
         }
+        else
+        {
+            footsteps.SetActive(true);
+        }
+        ChangeSprite();
+
     }
     private void OnCollisionEnter(Collision other)
     {
@@ -53,7 +64,7 @@ public class Player : MonoBehaviour
         if (go.tag == "Enemy")
         {
             //надпись FAILED и перезагрузка сцены
-            textFailed.SetActive(true);
+            GameManager.S.textFailed.SetActive(true);
             GameManager.S.DelayedRestart(3);
             //Debug.Log(go.name);
         }
@@ -74,6 +85,12 @@ public class Player : MonoBehaviour
             Enemy.isAngry = true;
             if (eaten)
             {
+                eatenCabbage++;
+                if (eatenCabbage == 6)
+                {
+                    GameManager.S.textSuccess.SetActive(true);
+                    GameManager.S.DelayedRestart(3);
+                }
                 Destroy(other.gameObject);
                 scale.timePassed = 0;
                 scale.timeScale.fillAmount = 0;
@@ -108,15 +125,11 @@ public class Player : MonoBehaviour
         delayBetweenSetBomb = 5f;
     }
 
-    //public void ChangeSprite()
-    //{
-    //    Vector2 pos = this.transform.position;
-    //    float xValue = target.position.x - pos.x;
-    //    float yValue = target.position.y - pos.y;
-
-    //    if (yValue > 0 && yValue > xValue) spriteRend.sprite = spritesCalm[2];
-    //    else if (yValue < 0 && yValue < xValue) spriteRend.sprite = spritesCalm[3];
-    //    else if (xValue > 0 && yValue < xValue) spriteRend.sprite = spritesCalm[0];
-    //    else if (xValue < 0 && yValue > xValue) spriteRend.sprite = spritesCalm[1];
-    //}
+    public void ChangeSprite()
+    {
+        if (yAxis > 0 && yAxis > xAxis) spriteRend.sprite = sprites[2];
+        else if (yAxis < 0 && yAxis < xAxis) spriteRend.sprite = sprites[3];
+        else if (xAxis > 0 && yAxis < xAxis) spriteRend.sprite = sprites[0];
+        else if (xAxis < 0 && yAxis > xAxis) spriteRend.sprite = sprites[1];
+    }
 }

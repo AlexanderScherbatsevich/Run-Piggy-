@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager S;
 
+    public GameObject textSuccess;
+    public GameObject textFailed;
     public Transform navMesh;
     public GameObject prefabStone;
     public GameObject prefabCabbage;
@@ -42,50 +44,51 @@ public class GameManager : MonoBehaviour
         SpawnCabbage();
         //InstallStones();
     }
-    void InstallStones()
-    {
-        //создать пустой игровой объект
-        if (stonesAnchor == null)
-        {
-            GameObject tGO = new GameObject("_StonesAnchor");
-            tGO.transform.SetParent(navMesh, true);
-            stonesAnchor = tGO.transform;
-        }
 
-        //разложить камни
-        foreach (SlotDef tSD in layout.slotDefs)
-        {
-            //prefabStone.transform.parent = layoutAnchor;
+    //void InstallStones()
+    //{
+    //    //создать пустой игровой объект
+    //    if (stonesAnchor == null)
+    //    {
+    //        GameObject tGO = new GameObject("_StonesAnchor");
+    //        tGO.transform.SetParent(navMesh, true);
+    //        stonesAnchor = tGO.transform;
+    //    }
 
-            //GameObject go = Instantiate<GameObject>(prefabStone);
-            //go.transform.SetParent(layoutAnchor, true);
-            //Vector2 pos = Vector2.zero;
-            //pos.x = tSD.x;
-            //pos.y = tSD.y;
-            //go.transform.position = pos;
+    //    разложить камни
+    //    foreach (SlotDef tSD in layout.slotDefs)
+    //    {
+    //        prefabStone.transform.parent = layoutAnchor;
 
-            //prefabStone.transform.localPosition = new Vector2(tSD.x, tSD.y);  //установить позицию в соответствии с SlotDef
+    //        GameObject go = Instantiate<GameObject>(prefabStone);
+    //        go.transform.SetParent(layoutAnchor, true);
+    //        Vector2 pos = Vector2.zero;
+    //        pos.x = tSD.x;
+    //        pos.y = tSD.y;
+    //        go.transform.position = pos;
 
-        }
+    //        prefabStone.transform.localPosition = new Vector2(tSD.x, tSD.y);  //установить позицию в соответствии с SlotDef
 
-        Vector2 tPos = _firstPosStone;
-        for (int i = 0; i < _rowCount; i++)
-        {
-            tPos = _firstPosStone;
-            _firstPosStone.y += _multiplier.y;
-            _firstPosStone.x += 0.3f;
-            for (int j = 0; j < _columnCount; j++)
-            {
-                GameObject go = Instantiate<GameObject>(prefabStone);
-                go.transform.SetParent(stonesAnchor, true);
-                Vector2 pos = Vector2.zero;
-                pos.x = tPos.x;
-                tPos.x += _multiplier.x;
-                pos.y = tPos.y;
-                go.transform.position = pos;
-            }
-        }
-    }
+    //    }
+
+    //    Vector2 tPos = _firstPosStone;
+    //    for (int i = 0; i < _rowCount; i++)
+    //    {
+    //        tPos = _firstPosStone;
+    //        _firstPosStone.y += _multiplier.y;
+    //        _firstPosStone.x += 0.3f;
+    //        for (int j = 0; j < _columnCount; j++)
+    //        {
+    //            GameObject go = Instantiate<GameObject>(prefabStone);
+    //            go.transform.SetParent(stonesAnchor, true);
+    //            Vector2 pos = Vector2.zero;
+    //            pos.x = tPos.x;
+    //            tPos.x += _multiplier.x;
+    //            pos.y = tPos.y;
+    //            go.transform.position = pos;
+    //        }
+    //    }
+    //}
     public List<Vector2> FreeSpotOnGround()
     {
 
@@ -100,10 +103,6 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < 9; j++)
             {
                 freeSpot.Add(tPos);
-
-                //GameObject go = Instantiate<GameObject>(prefabStone);
-                //go.transform.position = tPos;
-
                 tPos.x += _multiplier.x;                             
             }
         }
@@ -112,7 +111,6 @@ public class GameManager : MonoBehaviour
 
     public void SpawnCabbage()
     {
-        //Invoke("SpawnCabbage", interval);
 
         for (int i = 0; i <= cabbageAmount; i++)
         {
