@@ -2,23 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager S;
+
     public Transform navMesh;
     public GameObject prefabStone;
+    public GameObject prefabCabbage;
     public TextAsset layoutXML;
     public Layout layout;
-    public Transform layoutAnchor;
+    public Transform stonesAnchor;
     public List <Vector2> freeSpot;
+    public Vector2[] freePos;
+    public int cabbageAmount = 5;
 
     private NavMeshSurface2d navMeshSurface2D;
     private Vector3 _layoutCenter;
     private int _rowCount = 4, _columnCount = 8;
     private Vector2 _firstPosStone = new Vector2(-13.25f, -5.7f);
     private Vector2 _multiplier = new Vector2(3.55f, 3.5f);
+    public float interval = 2;
+    private float timeStart;
 
     private void Awake()
     {
@@ -31,17 +37,19 @@ public class GameManager : MonoBehaviour
         
         layout = GetComponent<Layout>();
         layout.ReadLayout(layoutXML.text);
-        //LayoutGame();
-    }
+        freePos = freeSpot.ToArray();
 
-    void LayoutGame()
+        SpawnCabbage();
+        //InstallStones();
+    }
+    void InstallStones()
     {
         //создать пустой игровой объект
-        if (layoutAnchor == null)
+        if (stonesAnchor == null)
         {
-            GameObject tGO = new GameObject("_LayoutAnchor");
+            GameObject tGO = new GameObject("_StonesAnchor");
             tGO.transform.SetParent(navMesh, true);
-            layoutAnchor = tGO.transform;
+            stonesAnchor = tGO.transform;
         }
 
         //разложить камни
@@ -69,7 +77,7 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < _columnCount; j++)
             {
                 GameObject go = Instantiate<GameObject>(prefabStone);
-                go.transform.SetParent(layoutAnchor, true);
+                go.transform.SetParent(stonesAnchor, true);
                 Vector2 pos = Vector2.zero;
                 pos.x = tPos.x;
                 tPos.x += _multiplier.x;
@@ -100,5 +108,29 @@ public class GameManager : MonoBehaviour
             }
         }
         return freeSpot;
+    }
+
+    public void SpawnCabbage()
+    {
+        //Invoke("SpawnCabbage", interval);
+
+        for (int i = 0; i <= cabbageAmount; i++)
+        {
+            GameObject go = Instantiate<GameObject>(prefabCabbage);
+            go.transform.SetParent(navMesh, true);
+            Vector2 pos = freePos[Random.Range(0, freePos.Length)];
+            go.transform.position = pos;
+
+        }
+    }
+
+    public void DelayedRestart(float delay)
+    {
+        Invoke("Restart", delay);
+    }
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
+        Debug.Log("Menu");
     }
 }
